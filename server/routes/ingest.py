@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, status
 
-from app.api.deps import get_ingestion_service
+from api.deps import get_ingestion_service
 from schemas.stock import IngestRequest, IngestResponse
 from services.ingestion import IngestionService
 

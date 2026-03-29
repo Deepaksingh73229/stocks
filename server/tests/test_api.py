@@ -36,12 +36,19 @@ MOCK_SUMMARY = {
     "last_updated": datetime(2024, 6, 1),
 }
 
+# ---------------------------------------------------------------------------
+# Patch target helpers – use the actual module path, not the old `app.*` path
+# ---------------------------------------------------------------------------
+
+_SVC = "services.stock_service.StockService"
+_INGEST_SVC = "services.ingestion.IngestionService"
+
 
 @pytest.mark.asyncio
 class TestCompaniesEndpoint:
     async def test_list_companies_success(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_companies",
+            f"{_SVC}.get_companies",
             new_callable=AsyncMock,
             return_value={"total": 1, "companies": [MOCK_COMPANY]},
         ):
@@ -53,7 +60,7 @@ class TestCompaniesEndpoint:
 
     async def test_list_companies_empty(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_companies",
+            f"{_SVC}.get_companies",
             new_callable=AsyncMock,
             return_value={"total": 0, "companies": []},
         ):
@@ -65,7 +72,7 @@ class TestCompaniesEndpoint:
 class TestStockDataEndpoint:
     async def test_get_data_success(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_stock_data",
+            f"{_SVC}.get_stock_data",
             new_callable=AsyncMock,
             return_value={
                 "symbol": "TCS.NS",
@@ -81,7 +88,7 @@ class TestStockDataEndpoint:
 
     async def test_get_data_not_found(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_stock_data",
+            f"{_SVC}.get_stock_data",
             new_callable=AsyncMock,
             return_value=None,
         ):
@@ -97,7 +104,7 @@ class TestStockDataEndpoint:
 class TestSummaryEndpoint:
     async def test_get_summary_success(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_summary",
+            f"{_SVC}.get_summary",
             new_callable=AsyncMock,
             return_value=MOCK_SUMMARY,
         ):
@@ -109,7 +116,7 @@ class TestSummaryEndpoint:
 
     async def test_get_summary_not_found(self, client):
         with patch(
-            "app.services.stock_service.StockService.get_summary",
+            f"{_SVC}.get_summary",
             new_callable=AsyncMock,
             return_value=None,
         ):
@@ -130,7 +137,7 @@ class TestCompareEndpoint:
             ],
         }
         with patch(
-            "app.services.stock_service.StockService.compare_stocks",
+            f"{_SVC}.compare_stocks",
             new_callable=AsyncMock,
             return_value=mock_result,
         ):
@@ -147,7 +154,7 @@ class TestCompareEndpoint:
 @pytest.mark.asyncio
 class TestHealthEndpoint:
     async def test_health_check(self, client):
-        with patch("app.api.v1.endpoints.health.get_client") as mock_client:
+        with patch("db.mongodb.get_client") as mock_client:
             mock_client.return_value.admin.command = AsyncMock(return_value={"ok": 1})
             resp = await client.get("/api/v1/health")
             assert resp.status_code == 200

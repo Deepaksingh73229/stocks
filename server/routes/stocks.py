@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.deps import get_stock_service
+from api.deps import get_stock_service
 from schemas.stock import (
     CompareResponse,
     StockDataResponse,
