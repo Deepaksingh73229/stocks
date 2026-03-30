@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 98%;
+    --foreground: 220 15% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 10%;
+    --primary: 217 91% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 220 15% 25%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 217 91% 96%;
+    --accent-foreground: 217 91% 35%;
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 217 91% 50%;
+    --radius: 0.5rem;
+    --gain: 142 71% 40%;
+    --gain-bg: 142 71% 96%;
+    --loss: 0 84% 55%;
+    --loss-bg: 0 84% 97%;
+  }
+
+  .dark {
+    --background: 222 20% 8%;
+    --foreground: 210 20% 94%;
+    --card: 222 18% 11%;
+    --card-foreground: 210 20% 94%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 20% 8%;
+    --secondary: 222 15% 16%;
+    --secondary-foreground: 210 15% 75%;
+    --muted: 222 15% 14%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 217 40% 18%;
+    --accent-foreground: 217 91% 70%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 15% 18%;
+    --input: 222 15% 18%;
+    --ring: 217 91% 60%;
+    --gain: 142 60% 48%;
+    --gain-bg: 142 40% 12%;
+    --loss: 0 75% 58%;
+    --loss-bg: 0 50% 12%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * { border-color: hsl(var(--border)); }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: "DM Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
 }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up { animation: fadeUp 0.4s ease-out forwards; }
+.animate-fade-up-d1 { animation: fadeUp 0.4s 0.05s ease-out forwards; opacity: 0; }
+.animate-fade-up-d2 { animation: fadeUp 0.4s 0.1s ease-out forwards; opacity: 0; }
+.animate-fade-up-d3 { animation: fadeUp 0.4s 0.15s ease-out forwards; opacity: 0; }
+.animate-fade-up-d4 { animation: fadeUp 0.4s 0.2s ease-out forwards; opacity: 0; }

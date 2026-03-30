@@ -4,7 +4,7 @@ from api.deps import get_ingestion_service
 from schemas.stock import IngestRequest, IngestResponse
 from services.ingestion import IngestionService
 
-router = APIRouter(prefix="/ingest", tags=["Ingestion"])
+router = APIRouter(prefix="/api/v1/ingest", tags=["Ingestion"])
 
 
 @router.post(
