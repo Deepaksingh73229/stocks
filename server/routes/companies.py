@@ -4,7 +4,7 @@ from api.deps import get_stock_service
 from schemas.stock import CompanyListResponse, CompanyResponse
 from services.stock_service import StockService
 
-router = APIRouter(prefix="/api/v1/companies", tags=["Companies"])
+router = APIRouter(prefix="/companies", tags=["Companies"])
 
 
 @router.get(
