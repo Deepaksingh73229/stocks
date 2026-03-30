@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_SYMBOLS = [
     "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS",
@@ -65,98 +66,88 @@ export default function IngestPage() {
     };
 
     return (
-        <div className="space-y-5 max-w-3xl">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">Data Ingestion</h1>
-                <p className="text-sm mt-0.5" style={{ color: "hsl(var(--muted-foreground))" }}>
+        <div className="space-y-6 max-w-3xl">
+            <div className="flex flex-col gap-1 tracking-wide border-b border-border/50 pb-6">
+                <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Data Ingestion</h1>
+                <p className="text-sm font-medium text-muted-foreground">
                     Fetch and process stock data from yfinance into the database
                 </p>
             </div>
 
             {/* Warning */}
-            <div
-                className="flex items-start gap-3 rounded-xl border p-4 text-sm"
-                style={{
-                    backgroundColor: "hsl(28 100% 55% / 0.08)",
-                    borderColor: "hsl(28 100% 55% / 0.3)",
-                    color: "hsl(var(--foreground))",
-                }}
-            >
-                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "hsl(28, 100%, 55%)" }} />
-                <p>
+            <div className="flex items-start gap-3 rounded-xl border border-orange-200 bg-orange-50/80 p-4 text-sm text-orange-800 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-400 shadow-sm animate-in fade-in">
+                <AlertTriangle className="h-5 w-5 shrink-0" />
+                <p className="font-medium leading-relaxed">
                     Synchronous ingestion may take 30–60 seconds depending on the number of symbols and period.
-                    Use &ldquo;Background&rdquo; mode for large datasets.
+                    Use <span className="font-bold">Background</span> mode for large datasets.
                 </p>
             </div>
 
             {/* Config */}
-            <Card className="animate-fade-up">
-                <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <Download className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
+            <Card className="animate-fade-up border-border/60 shadow-sm bg-card/80 backdrop-blur-sm">
+                <CardHeader className="border-b border-border/40 bg-muted/20 pb-5">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <Download className="h-5 w-5 text-primary" />
                         Ingestion Settings
                     </CardTitle>
-                    <CardDescription>Configure which symbols and time period to fetch</CardDescription>
+                    <CardDescription className="font-medium">Configure which symbols and time period to fetch</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-5">
+                <CardContent className="space-y-6 pt-6">
                     {/* Period */}
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Period</label>
+                    <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Period</label>
                         <Select value={period} onValueChange={setPeriod}>
-                            <SelectTrigger className="max-w-xs">
+                            <SelectTrigger className="max-w-xs shadow-sm font-medium">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                                 {PERIODS.map((p) => (
-                                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                                    <SelectItem key={p.value} value={p.value} className="font-medium">{p.label}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
 
                     {/* Symbols mode */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Symbols</label>
-                        <div className="flex gap-2">
+                    <div className="space-y-3">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Symbols</label>
+                        <div className="inline-flex bg-muted/50 p-1 rounded-lg border border-border/50">
                             <button
                                 onClick={() => setUseCustom(false)}
-                                className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
-                                style={{
-                                    borderColor: !useCustom ? "hsl(var(--primary))" : "hsl(var(--border))",
-                                    backgroundColor: !useCustom ? "hsl(var(--accent))" : "transparent",
-                                    color: !useCustom ? "hsl(var(--primary))" : "hsl(var(--foreground))",
-                                }}
+                                className={cn(
+                                    "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all",
+                                    !useCustom ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                                )}
                             >
-                                Default ({DEFAULT_SYMBOLS.length} stocks)
+                                Default <span className="opacity-70 font-medium">({DEFAULT_SYMBOLS.length})</span>
                             </button>
                             <button
                                 onClick={() => setUseCustom(true)}
-                                className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
-                                style={{
-                                    borderColor: useCustom ? "hsl(var(--primary))" : "hsl(var(--border))",
-                                    backgroundColor: useCustom ? "hsl(var(--accent))" : "transparent",
-                                    color: useCustom ? "hsl(var(--primary))" : "hsl(var(--foreground))",
-                                }}
+                                className={cn(
+                                    "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all",
+                                    useCustom ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                                )}
                             >
                                 Custom
                             </button>
                         </div>
 
                         {useCustom ? (
-                            <div className="space-y-1.5">
+                            <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
                                 <Input
                                     placeholder="RELIANCE.NS, TCS.NS, INFY.NS"
                                     value={customSymbols}
                                     onChange={(e) => setCustomSymbols(e.target.value)}
+                                    className="shadow-sm font-mono text-sm"
                                 />
-                                <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+                                <p className="text-xs font-medium text-muted-foreground">
                                     Enter comma-separated yfinance symbols (e.g. RELIANCE.NS for NSE)
                                 </p>
                             </div>
                         ) : (
-                            <div className="flex flex-wrap gap-1.5 mt-2">
+                            <div className="flex flex-wrap gap-2 mt-2 animate-in fade-in">
                                 {DEFAULT_SYMBOLS.map((s) => (
-                                    <Badge key={s} variant="secondary" className="font-mono text-xs">
+                                    <Badge key={s} variant="secondary" className="font-mono text-xs bg-muted/60 border-border/40 hover:bg-muted">
                                         {s.replace(".NS", "")}
                                     </Badge>
                                 ))}
@@ -165,85 +156,93 @@ export default function IngestPage() {
                     </div>
 
                     {/* Mode */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Run Mode</label>
-                        <div className="flex gap-2">
+                    <div className="space-y-3">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Run Mode</label>
+                        <div className="inline-flex bg-muted/50 p-1 rounded-lg border border-border/50">
                             {(["sync", "background"] as const).map((m) => (
                                 <button
                                     key={m}
                                     onClick={() => setMode(m)}
-                                    className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors capitalize"
-                                    style={{
-                                        borderColor: mode === m ? "hsl(var(--primary))" : "hsl(var(--border))",
-                                        backgroundColor: mode === m ? "hsl(var(--accent))" : "transparent",
-                                        color: mode === m ? "hsl(var(--primary))" : "hsl(var(--foreground))",
-                                    }}
+                                    className={cn(
+                                        "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all capitalize",
+                                        mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                                    )}
                                 >
-                                    {m === "sync" ? <Play className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                                    {m === "sync" ? <Play className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
                                     {m === "sync" ? "Synchronous" : "Background"}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <Button
-                        onClick={handleIngest}
-                        disabled={loading || (useCustom && !customSymbols.trim())}
-                        className="w-full sm:w-auto"
-                    >
-                        {loading
-                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Ingesting…</>
-                            : <><Download className="h-4 w-4" /> Start Ingestion</>}
-                    </Button>
+                    <div className="pt-2 border-t border-border/50">
+                        <Button
+                            onClick={handleIngest}
+                            disabled={loading || (useCustom && !customSymbols.trim())}
+                            className="w-full sm:w-auto shadow-sm"
+                            size="lg"
+                        >
+                            {loading
+                                ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Ingesting Data…</>
+                                : <><Download className="h-4 w-4 mr-2" /> Start Ingestion</>}
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
 
             {/* Result */}
             {error && (
-                <div
-                    className="rounded-xl border p-4 text-sm flex items-start gap-2"
-                    style={{ backgroundColor: "hsl(var(--loss-bg))", borderColor: "hsl(var(--loss))", color: "hsl(var(--loss))" }}
-                >
-                    <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                    {error}
+                <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50/50 p-4 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400 animate-in fade-in slide-in-from-top-2 shadow-sm">
+                    <XCircle className="h-5 w-5 shrink-0" />
+                    <p className="font-semibold">{error}</p>
                 </div>
             )}
 
             {result && (
-                <Card className="animate-fade-up">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(var(--gain))" }} />
+                <Card className="animate-fade-up border-border/60 shadow-sm overflow-hidden">
+                    <CardHeader className="border-b border-border/40 bg-emerald-50/50 dark:bg-emerald-950/20 pb-4">
+                        <CardTitle className="flex items-center gap-2 text-base font-bold text-emerald-700 dark:text-emerald-400">
+                            <CheckCircle2 className="h-5 w-5" />
                             Ingestion Complete
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid gap-3 sm:grid-cols-3">
-                            <div className="rounded-lg p-4 text-center" style={{ backgroundColor: "hsl(var(--gain-bg))" }}>
-                                <p className="text-2xl font-bold" style={{ color: "hsl(var(--gain))" }}>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="grid gap-4 sm:grid-cols-3">
+                            <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/50 p-4 text-center dark:border-emerald-500/10 dark:bg-emerald-500/5">
+                                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
                                     {result.symbols_processed.length || "—"}
                                 </p>
-                                <p className="text-xs mt-1" style={{ color: "hsl(var(--muted-foreground))" }}>Processed</p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800/70 dark:text-emerald-400/70 mt-1">Processed</p>
                             </div>
-                            <div className="rounded-lg p-4 text-center" style={{ backgroundColor: result.symbols_failed.length > 0 ? "hsl(var(--loss-bg))" : "hsl(var(--muted))" }}>
-                                <p className="text-2xl font-bold" style={{ color: result.symbols_failed.length > 0 ? "hsl(var(--loss))" : "hsl(var(--foreground))" }}>
+                            <div className={cn(
+                                "rounded-xl border p-4 text-center transition-colors",
+                                result.symbols_failed.length > 0
+                                    ? "border-rose-200/60 bg-rose-50/50 dark:border-rose-500/10 dark:bg-rose-500/5"
+                                    : "border-border/50 bg-muted/20"
+                            )}>
+                                <p className={cn(
+                                    "text-3xl font-black",
+                                    result.symbols_failed.length > 0 ? "text-rose-600 dark:text-rose-400" : "text-muted-foreground"
+                                )}>
                                     {result.symbols_failed.length || "0"}
                                 </p>
-                                <p className="text-xs mt-1" style={{ color: "hsl(var(--muted-foreground))" }}>Failed</p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-1">Failed</p>
                             </div>
-                            <div className="rounded-lg p-4 text-center" style={{ backgroundColor: "hsl(var(--muted))" }}>
-                                <p className="text-2xl font-bold">{result.duration_seconds > 0 ? `${result.duration_seconds.toFixed(1)}s` : "—"}</p>
-                                <p className="text-xs mt-1" style={{ color: "hsl(var(--muted-foreground))" }}>Duration</p>
+                            <div className="rounded-xl border border-border/50 bg-muted/20 p-4 text-center">
+                                <p className="text-3xl font-black text-foreground">
+                                    {result.duration_seconds > 0 ? `${result.duration_seconds.toFixed(1)}s` : "—"}
+                                </p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-1">Duration</p>
                             </div>
                         </div>
 
                         {result.symbols_processed.length > 0 && (
                             <div>
-                                <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "hsl(var(--muted-foreground))" }}>Processed</p>
-                                <div className="flex flex-wrap gap-1.5">
+                                <p className="text-xs font-bold mb-3 uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1 w-fit">Processed Symbols</p>
+                                <div className="flex flex-wrap gap-2">
                                     {result.symbols_processed.map((s) => (
-                                        <Badge key={s} variant="gain" className="font-mono text-xs">
-                                            <CheckCircle2 className="h-2.5 w-2.5 mr-1" />
+                                        <Badge key={s} variant="gain" className="font-mono text-[11px] px-2 py-0.5">
+                                            <CheckCircle2 className="h-3 w-3 mr-1" />
                                             {s.replace(".NS", "")}
                                         </Badge>
                                     ))}
@@ -253,11 +252,11 @@ export default function IngestPage() {
 
                         {result.symbols_failed.length > 0 && (
                             <div>
-                                <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "hsl(var(--loss))" }}>Failed</p>
-                                <div className="flex flex-wrap gap-1.5">
+                                <p className="text-xs font-bold mb-3 uppercase tracking-wider text-rose-500 dark:text-rose-400 border-b border-border/40 pb-1 w-fit">Failed Symbols</p>
+                                <div className="flex flex-wrap gap-2">
                                     {result.symbols_failed.map((s) => (
-                                        <Badge key={s} variant="loss" className="font-mono text-xs">
-                                            <XCircle className="h-2.5 w-2.5 mr-1" />
+                                        <Badge key={s} variant="loss" className="font-mono text-[11px] px-2 py-0.5">
+                                            <XCircle className="h-3 w-3 mr-1" />
                                             {s.replace(".NS", "")}
                                         </Badge>
                                     ))}
@@ -265,7 +264,9 @@ export default function IngestPage() {
                             </div>
                         )}
 
-                        <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>{result.message}</p>
+                        <div className="rounded-lg bg-muted/30 p-3 text-sm font-medium text-muted-foreground border border-border/40">
+                            {result.message}
+                        </div>
                     </CardContent>
                 </Card>
             )}

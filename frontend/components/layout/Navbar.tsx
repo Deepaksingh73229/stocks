@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import {
-    BarChart2, TrendingUp, GitCompare, Settings, Activity, Circle,
-} from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { ThemeToggle } from "../themes/theme-toggle";
+import { BarChart2, TrendingUp, GitCompare, Settings, Activity } from "lucide-react";
 
 const navLinks = [
     { href: "/", label: "Dashboard", icon: BarChart2 },
@@ -18,37 +16,20 @@ const navLinks = [
 
 export function Navbar() {
     const pathname = usePathname();
-    const [health, setHealth] = useState<{ ok: boolean; version: string } | null>(null);
-
-    useEffect(() => {
-        api
-            .health()
-            .then((h) => setHealth({ ok: h.db_connected, version: h.version }))
-            .catch(() => setHealth({ ok: false, version: "—" }));
-    }, []);
 
     return (
-        <header
-            className="sticky top-0 z-50 border-b backdrop-blur-md"
-            style={{
-                backgroundColor: "hsl(var(--background) / 0.85)",
-                borderColor: "hsl(var(--border))",
-            }}
-        >
-            <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl transition-all">
+            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
-                    <div
-                        className="flex h-7 w-7 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: "hsl(var(--primary))" }}
-                    >
-                        <Activity className="h-4 w-4 text-white" />
+                <Link href="/" className="flex items-center gap-2.5 font-bold text-lg tracking-tight hover:opacity-90 transition-opacity outline-none">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                        <Activity className="h-5 w-5" strokeWidth={2.5} />
                     </div>
-                    <span>StockIQ</span>
+                    <span className="text-foreground">Stocks</span>
                 </Link>
 
-                {/* Nav links */}
-                <nav className="hidden md:flex items-center gap-1">
+                {/* Nav links (Desktop) */}
+                <nav className="hidden md:flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border/50">
                     {navLinks.map(({ href, label, icon: Icon }) => {
                         const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
                         return (
@@ -56,19 +37,11 @@ export function Navbar() {
                                 key={href}
                                 href={href}
                                 className={cn(
-                                    "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all outline-none",
                                     active
-                                        ? "text-foreground"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                        ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
                                 )}
-                                style={
-                                    active
-                                        ? {
-                                            backgroundColor: "hsl(var(--muted))",
-                                            color: "hsl(var(--foreground))",
-                                        }
-                                        : {}
-                                }
                             >
                                 <Icon className="h-4 w-4" />
                                 {label}
@@ -77,24 +50,13 @@ export function Navbar() {
                     })}
                 </nav>
 
-                {/* Status indicator */}
-                <div className="flex items-center gap-2">
-                    {health !== null && (
-                        <div className="flex items-center gap-1.5 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-                            <Circle
-                                className="h-2 w-2 fill-current"
-                                style={{ color: health.ok ? "hsl(var(--gain))" : "hsl(var(--loss))" }}
-                            />
-                            <span className="hidden sm:inline">
-                                {health.ok ? "Live" : "Offline"} · v{health.version}
-                            </span>
-                        </div>
-                    )}
+                <div className="flex items-center">
+                    <ThemeToggle />
                 </div>
             </div>
 
-            {/* Mobile nav */}
-            <div className="flex md:hidden border-t px-4 py-1" style={{ borderColor: "hsl(var(--border))" }}>
+            {/* Mobile nav (Bottom bar style for better UX) */}
+            <div className="flex md:hidden border-t border-border/60 bg-background/95 pb-safe">
                 {navLinks.map(({ href, label, icon: Icon }) => {
                     const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
                     return (
@@ -102,12 +64,13 @@ export function Navbar() {
                             key={href}
                             href={href}
                             className={cn(
-                                "flex flex-1 flex-col items-center gap-0.5 py-1 text-[10px] font-medium transition-colors",
-                                active ? "text-primary" : "text-muted-foreground"
+                                "flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[11px] font-semibold transition-colors outline-none",
+                                active
+                                    ? "text-primary bg-primary/5"
+                                    : "text-muted-foreground hover:bg-muted/50"
                             )}
-                            style={active ? { color: "hsl(var(--primary))" } : {}}
                         >
-                            <Icon className="h-4 w-4" />
+                            <Icon className={cn("h-5 w-5", active ? "stroke-[2.5]" : "")} />
                             {label}
                         </Link>
                     );

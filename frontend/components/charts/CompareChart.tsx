@@ -43,27 +43,29 @@ export function CompareChart({ data1, data2, symbol1, symbol2 }: CompareChartPro
 
     return (
         <ResponsiveContainer width="100%" height={320}>
-            <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <LineChart data={chartData} margin={{ top: 12, right: 12, bottom: 0, left: 0 }}>
                 <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="hsl(var(--border))"
-                    opacity={0.5}
+                    opacity={0.4}
                     vertical={false}
                 />
                 <XAxis
                     dataKey="date"
                     tickFormatter={(v) => formatShortDate(v)}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
                     interval="preserveStartEnd"
+                    dy={10}
                 />
                 <YAxis
                     tickFormatter={(v) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))", fontWeight: 500 }}
                     axisLine={false}
                     tickLine={false}
-                    width={64}
+                    width={70}
+                    dx={-10}
                 />
                 <Tooltip
                     formatter={(value, name) => [
@@ -72,33 +74,46 @@ export function CompareChart({ data1, data2, symbol1, symbol2 }: CompareChartPro
                             : String(value),
                         String(name).replace(".NS", ""),
                     ]}
-                    labelFormatter={(label) => formatShortDate(label)}
+                    labelFormatter={(label) => formatShortDate(label as string)}
                     contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "12px",
-                        fontSize: 12,
+                        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                        color: "hsl(var(--foreground))",
+                        fontSize: "13px",
+                        fontWeight: 500,
+                    }}
+                    itemStyle={{
+                        paddingTop: "4px",
+                    }}
+                    labelStyle={{
+                        color: "hsl(var(--muted-foreground))",
+                        marginBottom: "4px",
+                        fontWeight: 600,
                     }}
                 />
                 <Legend
-                    formatter={(v) => v.replace(".NS", "")}
-                    wrapperStyle={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}
+                    formatter={(v) => <span style={{ color: "hsl(var(--foreground))", fontWeight: 500 }}>{v.replace(".NS", "")}</span>}
+                    wrapperStyle={{ fontSize: 13, paddingTop: "20px" }}
+                    iconType="circle"
+                    iconSize={8}
                 />
                 <Line
                     type="monotone"
                     dataKey={symbol1}
-                    stroke="hsl(217, 91%, 60%)"
-                    strokeWidth={2}
+                    stroke="#3b82f6" /* Tailwind blue-500 */
+                    strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 4 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: "#3b82f6" }}
                 />
                 <Line
                     type="monotone"
                     dataKey={symbol2}
-                    stroke="hsl(28, 100%, 55%)"
-                    strokeWidth={2}
+                    stroke="#f97316" /* Tailwind orange-500 */
+                    strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 4 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: "#f97316" }}
                 />
             </LineChart>
         </ResponsiveContainer>

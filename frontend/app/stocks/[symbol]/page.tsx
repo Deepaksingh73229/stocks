@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatCurrency, formatPercent, formatNumber } from "@/lib/utils";
+import { formatCurrency, formatPercent, formatNumber, cn } from "@/lib/utils";
 
 const PERIODS: { label: string; days: number }[] = [
     { label: "7D", days: 7 },
@@ -63,84 +63,83 @@ export default function StockDetailPage({
     const shortSymbol = decodedSymbol.replace(".NS", "");
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-6">
             {/* Back + header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-6">
+                <div className="flex items-center gap-4">
                     <Link href="/stocks">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 shadow-sm hover:bg-secondary/80">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                     </Link>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-2xl font-bold tracking-tight">{shortSymbol}</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">{shortSymbol}</h1>
                             {!loading && ret !== null && ret !== undefined && (
-                                <Badge variant={isGain ? "gain" : "loss"}>
-                                    {isGain ? <TrendingUp className="h-3 w-3 mr-0.5" /> : <TrendingDown className="h-3 w-3 mr-0.5" />}
+                                <Badge variant={isGain ? "gain" : "loss"} className="px-2 py-0.5 text-xs font-semibold">
+                                    {isGain ? <TrendingUp className="h-3.5 w-3.5 mr-1 stroke-[2.5]" /> : <TrendingDown className="h-3.5 w-3.5 mr-1 stroke-[2.5]" />}
                                     {formatPercent(ret)}
                                 </Badge>
                             )}
                         </div>
-                        <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">
                             {decodedSymbol} · NSE
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <Link href={`/compare?s1=${decodedSymbol}`}>
-                        <Button variant="outline" size="sm">
-                            <GitCompare className="h-4 w-4" />
+                        <Button variant="outline" size="sm" className="shadow-sm hover:bg-secondary/80">
+                            <GitCompare className="h-4 w-4 mr-2" />
                             Compare
                         </Button>
                     </Link>
-                    <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-                        <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                    <Button variant="outline" size="icon" className="h-9 w-9 shadow-sm hover:bg-secondary/80" onClick={fetchData} disabled={loading}>
+                        <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-primary" : "text-muted-foreground"}`} />
                     </Button>
                 </div>
             </div>
 
             {error && (
-                <div
-                    className="rounded-xl border p-4 text-sm"
-                    style={{ backgroundColor: "hsl(var(--loss-bg))", borderColor: "hsl(var(--loss))", color: "hsl(var(--loss))" }}
-                >
-                    ⚠ {error}
+                <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50/50 p-4 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
+                    <span className="text-lg">⚠</span>
+                    <p className="font-medium">{error}</p>
                 </div>
             )}
 
             {/* Price + chart */}
-            <Card className="animate-fade-up">
-                <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between flex-wrap gap-3">
+            <Card className="animate-fade-up border-border/60 shadow-sm overflow-hidden">
+                <CardHeader className="pb-4 border-b border-border/40 bg-muted/10">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                         <div>
-                            {loading
-                                ? <Skeleton className="h-9 w-36" />
-                                : (
-                                    <p className="text-3xl font-bold tracking-tight">
-                                        {latestPrice ? formatCurrency(latestPrice.close) : "—"}
-                                    </p>
-                                )}
-                            {loading
-                                ? <Skeleton className="h-4 w-24 mt-1" />
-                                : (
-                                    <p className="text-sm mt-1" style={{ color: "hsl(var(--muted-foreground))" }}>
-                                        Latest close price
-                                    </p>
-                                )}
+                            {loading ? (
+                                <Skeleton className="h-10 w-36 mb-1" />
+                            ) : (
+                                <p className="text-4xl font-extrabold tracking-tight text-foreground">
+                                    {latestPrice ? formatCurrency(latestPrice.close) : "—"}
+                                </p>
+                            )}
+                            {loading ? (
+                                <Skeleton className="h-4 w-24 mt-2" />
+                            ) : (
+                                <p className="text-sm font-medium text-muted-foreground mt-1">
+                                    Latest close price
+                                </p>
+                            )}
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-3 flex-wrap">
                             <Button
                                 variant={showMA ? "default" : "outline"}
                                 size="sm"
+                                className={showMA ? "shadow-md" : "shadow-sm"}
                                 onClick={() => setShowMA((v) => !v)}
                             >
-                                MA overlay
+                                MA Overlay
                             </Button>
-                            <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-                                <TabsList>
+                            <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))} className="w-fit">
+                                <TabsList className="grid w-full grid-cols-4 shadow-sm">
                                     {PERIODS.map((p) => (
-                                        <TabsTrigger key={p.days} value={String(p.days)}>
+                                        <TabsTrigger key={p.days} value={String(p.days)} className="text-xs font-semibold">
                                             {p.label}
                                         </TabsTrigger>
                                     ))}
@@ -149,9 +148,9 @@ export default function StockDetailPage({
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                     {loading ? (
-                        <Skeleton className="h-[300px] w-full rounded-xl" />
+                        <Skeleton className="h-[350px] w-full rounded-xl" />
                     ) : (
                         <PriceChart data={stockData?.data ?? []} showMA={showMA} />
                     )}
@@ -166,19 +165,23 @@ export default function StockDetailPage({
                     { label: "Avg Close", value: summary?.avg_close, icon: BarChart2, fmt: formatCurrency },
                     { label: "Trading Days", value: summary?.total_trading_days, icon: Calendar, fmt: (v: number) => formatNumber(v, 0) },
                 ].map(({ label, value, icon: Icon, fmt }) => (
-                    <Card key={label}>
+                    <Card key={label} className="border-border/60 shadow-sm bg-card/80 backdrop-blur-sm hover:shadow-md transition-shadow">
                         <CardContent className="p-5">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "hsl(var(--muted-foreground))" }}>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                                         {label}
                                     </p>
-                                    {loading || !summary
-                                        ? <Skeleton className="h-6 w-24 mt-1.5" />
-                                        : <p className="text-xl font-bold mt-0.5">{value !== undefined ? fmt(value as number) : "—"}</p>}
+                                    {loading || !summary ? (
+                                        <Skeleton className="h-8 w-24 mt-1" />
+                                    ) : (
+                                        <p className="text-2xl font-extrabold text-foreground tracking-tight">
+                                            {value !== undefined ? fmt(value as number) : "—"}
+                                        </p>
+                                    )}
                                 </div>
-                                <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: "hsl(var(--muted))" }}>
-                                    <Icon className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground shadow-sm">
+                                    <Icon className="h-5 w-5" />
                                 </div>
                             </div>
                         </CardContent>
@@ -188,14 +191,14 @@ export default function StockDetailPage({
 
             {/* Latest metrics table */}
             {!loading && latestPrice && (
-                <Card className="animate-fade-up-d2">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Activity className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
+                <Card className="animate-fade-up-d2 border-border/60 shadow-sm overflow-hidden">
+                    <CardHeader className="pb-4 border-b border-border/40 bg-muted/20">
+                        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                            <Activity className="h-5 w-5 text-primary" />
                             Latest Day Metrics
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-5">
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                             {[
                                 { label: "Open", value: formatCurrency(latestPrice.open) },
@@ -203,25 +206,28 @@ export default function StockDetailPage({
                                 { label: "Low", value: formatCurrency(latestPrice.low) },
                                 { label: "Close", value: formatCurrency(latestPrice.close) },
                                 { label: "Volume", value: formatNumber(latestPrice.volume, 0) },
-                                { label: "Daily Return", value: latestPrice.daily_return !== null ? formatPercent(latestPrice.daily_return) : "—", highlight: latestPrice.daily_return !== null ? (latestPrice.daily_return >= 0 ? "gain" : "loss") : undefined },
+                                {
+                                    label: "Daily Return",
+                                    value: latestPrice.daily_return !== null ? formatPercent(latestPrice.daily_return) : "—",
+                                    highlight: latestPrice.daily_return !== null ? (latestPrice.daily_return >= 0 ? "gain" : "loss") : undefined
+                                },
                                 { label: "MA7", value: latestPrice.ma7 ? formatCurrency(latestPrice.ma7) : "—" },
                                 { label: "MA20", value: latestPrice.ma20 ? formatCurrency(latestPrice.ma20) : "—" },
                             ].map(({ label, value, highlight }) => (
                                 <div
                                     key={label}
-                                    className="rounded-lg p-3"
-                                    style={{ backgroundColor: "hsl(var(--muted))" }}
+                                    className="flex flex-col rounded-xl p-4 border border-border/40 bg-muted/30 dark:bg-muted/10 transition-colors hover:bg-muted/50"
                                 >
-                                    <p className="text-xs font-medium" style={{ color: "hsl(var(--muted-foreground))" }}>{label}</p>
+                                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                                        {label}
+                                    </p>
                                     <p
-                                        className="text-sm font-bold mt-0.5"
-                                        style={{
-                                            color: highlight === "gain"
-                                                ? "hsl(var(--gain))"
-                                                : highlight === "loss"
-                                                    ? "hsl(var(--loss))"
-                                                    : "hsl(var(--foreground))",
-                                        }}
+                                        className={cn(
+                                            "text-lg font-bold mt-1 tracking-tight",
+                                            highlight === "gain" && "text-emerald-500 dark:text-emerald-400",
+                                            highlight === "loss" && "text-rose-500 dark:text-rose-400",
+                                            !highlight && "text-foreground"
+                                        )}
                                     >
                                         {value}
                                     </p>

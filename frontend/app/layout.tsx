@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
+import { ThemeProvider } from "@/components/themes/theme-provider";
 
 export const metadata: Metadata = {
   title: { default: "StockIQ", template: "%s · StockIQ" },
@@ -18,10 +20,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen" style={{ backgroundColor: "hsl(var(--background))", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</main>
+
+      <body className="min-h-screen">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</main>
+        </ThemeProvider>
       </body>
-    </html>
+    </html >
   );
 }

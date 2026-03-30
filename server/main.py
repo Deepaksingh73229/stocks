@@ -6,11 +6,6 @@ from fastapi.responses import JSONResponse
 
 from router import api_router
 
-# from routes.companies import router as company_router
-# from routes.health import router as health_router
-# from routes.ingest import router as ingest_router
-# from routes.stocks import router as stocks_router
-
 from core.config import settings
 from core.logging import get_logger, setup_logging
 from db.mongodb import connect_db, disconnect_db, get_database
@@ -77,12 +72,6 @@ def create_app() -> FastAPI:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"detail": "An internal server error occurred."},
         )
-
-    # ─── Routers ──────────────────────────────────────────────────────────────
-    # app.include_router(company_router)
-    # app.include_router(health_router)
-    # app.include_router(ingest_router)
-    # app.include_router(stocks_router)
 
     app.include_router(api_router)
 

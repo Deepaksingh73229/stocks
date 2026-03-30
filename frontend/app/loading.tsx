@@ -1,12 +1,15 @@
+import { Loader2 } from "lucide-react";
+
 export default function Loading() {
     return (
-        <div className="flex min-h-[40vh] items-center justify-center">
-            <div className="flex items-center gap-3" style={{ color: "hsl(var(--muted-foreground))" }}>
-                <div
-                    className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"
-                    style={{ borderColor: "hsl(var(--primary))", borderTopColor: "transparent" }}
-                />
-                <span className="text-sm font-medium">Loading…</span>
+        <div className="flex min-h-[60vh] w-full flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center space-y-4 animate-in fade-in zoom-in-95 duration-500">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/30 border border-border/50 shadow-sm">
+                    <Loader2 className="h-7 w-7 animate-spin text-primary" />
+                </div>
+                <p className="text-sm font-semibold tracking-wide text-muted-foreground animate-pulse">
+                    Loading data...
+                </p>
             </div>
         </div>
     );
