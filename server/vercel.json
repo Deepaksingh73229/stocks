@@ -1,14 +1,28 @@
 {
-    "builds": [
+    "version": 2,
+    
+    "crons": [
         {
-            "src": "./main.py",
-            "use": "@vercel/python"
+            "path": "/api/v1/ingest/background",
+            "schedule": "30 13 * * 1-5"
         }
     ],
+
+    "builds": [
+        {
+            "src": "main.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "15mb",
+                "runtime": "python3.12"
+            }
+        }
+    ],
+
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/main.py"
+            "dest": "main.py"
         }
     ]
 }

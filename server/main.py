@@ -5,66 +5,53 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from router import api_router
-
 from core.config import settings
 from core.logging import get_logger, setup_logging
-from db.mongodb import connect_db, disconnect_db, get_database
-from utils.scheduler import create_scheduler, start_scheduler, stop_scheduler
 
 setup_logging()
 logger = get_logger(__name__)
 
 
-# ─── Lifespan ─────────────────────────────────────────────────────────────────
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    logger.info("Starting %s v%s [%s]", settings.app_name, settings.app_version, settings.environment)
-
-    await connect_db()
-    db = get_database()
-    app.state.db = db
-
-    scheduler = create_scheduler()
-    app.state.scheduler = scheduler
-
-    if settings.enable_scheduler:
-        start_scheduler(scheduler, db)
+    # On Vercel: skip scheduler, use lazy DB connection
+    from db.mongodb import connect_db, get_database
+    try:
+        await connect_db()
+        app.state.db = get_database()
+        logger.info("DB connected on startup")
+    except Exception as e:
+        logger.warning("DB connect failed at startup (will retry per-request): %s", e)
+        app.state.db = None
 
     yield
 
-    # Shutdown
-    stop_scheduler(scheduler)
-    await disconnect_db()
-    logger.info("Application shut down cleanly.")
+    from db.mongodb import disconnect_db
+    try:
+        await disconnect_db()
+    except Exception:
+        pass
 
-# ─── App Factory ──────────────────────────────────────────────────────────────
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
-        description=(
-            "A financial data platform for NSE/BSE stock market intelligence. "
-            "Provides REST APIs for stock data, metrics, comparisons, and top movers."
-        ),
+        description="Stock Data Intelligence Dashboard API",
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/openapi.json",
         lifespan=lifespan,
     )
 
-    # ─── CORS ─────────────────────────────────────────────────────────────────
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins,
+        allow_origins=["*"],  # Tighten this for production
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    # ─── Global Exception Handler ─────────────────────────────────────────────
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         logger.error("Unhandled exception: %s", exc, exc_info=True)
@@ -75,7 +62,6 @@ def create_app() -> FastAPI:
 
     app.include_router(api_router)
 
-    # Root redirect info
     @app.get("/", include_in_schema=False)
     async def root():
         return {

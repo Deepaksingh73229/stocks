@@ -7,10 +7,16 @@ logger = get_logger(__name__)
 
 _client: AsyncIOMotorClient | None = None
 
+
 def get_client() -> AsyncIOMotorClient:
     global _client
+    # Lazy initialization — critical for serverless cold starts
     if _client is None:
-        raise RuntimeError("MongoDB client not initialized. Call connect_db() first.")
+        _client = AsyncIOMotorClient(
+            settings.mongodb_url,
+            serverSelectionTimeoutMS=5000,
+            maxPoolSize=10,
+        )
     return _client
 
 
@@ -20,14 +26,9 @@ def get_database() -> AsyncIOMotorDatabase:
 
 async def connect_db() -> None:
     global _client
-    logger.info("Connecting to MongoDB at %s", settings.mongodb_url)
-    _client = AsyncIOMotorClient(
-        settings.mongodb_url,
-        serverSelectionTimeoutMS=5000,
-        maxPoolSize=10,
-    )
-    # Verify connection
-    await _client.admin.command("ping")
+    logger.info("Connecting to MongoDB...")
+    client = get_client()
+    await client.admin.command("ping")
     logger.info("MongoDB connection established.")
     await _ensure_indexes()
 
@@ -41,33 +42,21 @@ async def disconnect_db() -> None:
 
 
 async def _ensure_indexes() -> None:
-    """Create indexes for all collections on startup."""
     db = get_database()
 
-    # --- companies ---
-    await db.companies.create_indexes(
-        [
-            IndexModel([("symbol", ASCENDING)], unique=True, name="symbol_unique"),
-        ]
-    )
-
-    # --- stock_prices ---
-    await db.stock_prices.create_indexes(
-        [
-            IndexModel(
-                [("symbol", ASCENDING), ("date", DESCENDING)],
-                unique=True,
-                name="symbol_date_unique",
-            ),
-            IndexModel([("date", DESCENDING)], name="date_desc"),
-        ]
-    )
-
-    # --- summaries ---
-    await db.summaries.create_indexes(
-        [
-            IndexModel([("symbol", ASCENDING)], unique=True, name="symbol_unique"),
-        ]
-    )
+    await db.companies.create_indexes([
+        IndexModel([("symbol", ASCENDING)], unique=True, name="symbol_unique"),
+    ])
+    await db.stock_prices.create_indexes([
+        IndexModel(
+            [("symbol", ASCENDING), ("date", DESCENDING)],
+            unique=True,
+            name="symbol_date_unique",
+        ),
+        IndexModel([("date", DESCENDING)], name="date_desc"),
+    ])
+    await db.summaries.create_indexes([
+        IndexModel([("symbol", ASCENDING)], unique=True, name="symbol_unique"),
+    ])
 
     logger.info("MongoDB indexes ensured.")
